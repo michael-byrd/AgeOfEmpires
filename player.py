@@ -6,9 +6,11 @@ import requests
 import sys
 
 # while True:
-url = f"https://aoe2.net/api/player/lastmatch?game=aoe2de&profile_id=313591"
+url = f"https://aoe2.net/api/player/lastmatch?game=aoe2de&profile_id=313591" #313591 5001328
 resp = requests.get(url).json()
 lastmatch = resp['last_match']
+playerName = resp['name']
+print(playerName)
 players = []
 team1 = []
 team2 = []
@@ -17,12 +19,12 @@ hammerTeam2 = False
 
 
 class Player:
-    def __init__(self, id, team, color):
+    def __init__(self, id, team, color, name):
         self.id = id
         self.team = team
         self.color = color
-        self.name = ''
-        self.country = ''
+        self.name = name
+        self.country = '--'
         self.tg_rating = 0
         self.rating = 0
 
@@ -38,11 +40,11 @@ class Player:
 
         if len(player_tg["leaderboard"]) > 0:
             playerLeaderboard = player_tg["leaderboard"][0]
-            self.name = playerLeaderboard["name"]
+            # self.name = playerLeaderboard["name"]
             self.country = playerLeaderboard["country"]
         if len(player_1v1["leaderboard"]) > 0:
             playerLeaderboard = player_1v1["leaderboard"][0]
-            self.name = playerLeaderboard["name"]
+            # self.name = playerLeaderboard["name"]
             self.country = playerLeaderboard["country"]
         if len(player_1v1_rate) > 0:
             self.rating = player_1v1_rate[0]['rating']
@@ -56,7 +58,7 @@ class Player:
 def getPlayerIDs():
     for player in lastmatch['players']:
         # profileIDs.append(player['profile_id'])
-        players.append(Player(player['profile_id'], player['team'], player['color']))
+        players.append(Player(player['profile_id'], player['team'], player['color'], player['name']))
     for player in players:
         if player.team == 1:
             team1.append(player)
@@ -68,9 +70,9 @@ with open('index2.html', 'w', encoding="utf-8") as info:
     getPlayerIDs()
     for player in players:
         player.info()
-        if player.name == 'BSHammer'and player.team == 1:
+        if (player.name == playerName) and player.team == 1:
             hammerTeam1 = True
-        elif player.name == 'BSHammer' and player.team == 2:
+        elif (player.name == playerName) and player.team == 2:
             hammerTeam2 = True
         count += 1
     print("Team1", hammerTeam1)
